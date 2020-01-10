@@ -34,7 +34,7 @@ class DyeWall:
         else:
             node.left = self._dye(node.left, l, mid, {color})
             node.right = self._dye(node.right, mid + 1, r, {color})
-        node.value = self._merger(node.left.value, node.right.value)
+        node.value = self._segment_tree._merger(node.left.value, node.right.value)
         return node
 
     @staticmethod
