@@ -1,3 +1,6 @@
+from random import randint
+
+
 class Node:
     def __init__(self, left=None, right=None, bound_l=None, bound_r=None, value=None, is_left=None, is_right=None):
         self.is_left = is_left
@@ -25,9 +28,11 @@ class SegmentTree:
     线段树
     """
 
-    def __init__(self, data: list, merger: callable):
+    def __init__(self, data: list, merger: callable, lazy_push_down, lazy_tag_processor):
         self.data = data
         self._merger = merger
+        self._lazy_push_down = lazy_push_down
+        self._lazy_tag_processor = lazy_tag_processor
         self._root = self._build()
 
     @property
@@ -52,7 +57,7 @@ class SegmentTree:
         right_node = self._build_segment_tree(Node(bound_l=mid + 1, bound_r=node.bound_r, is_right=True))
         node.left = left_node
         node.right = right_node
-        node.value = self._merger(left_node.value, right_node.value) # left + right
+        node.value = self._merger(left_node.value, right_node.value)  # left + right
         return node
 
     def get(self, index):
@@ -148,8 +153,7 @@ class SegmentTree:
 
     def _update_segment(self, node, l, r, x):
         if node.bound_l == l and node.bound_r == r:
-            node.value += (r - l + 1) * x
-            node.lazy_tag += x
+            self._lazy_tag_processor(node, l, r, x)
             return node
 
         mid = node.bound_l + (node.bound_r - node.bound_l) // 2
@@ -164,42 +168,32 @@ class SegmentTree:
         node.value = self._merger(node.left.value, node.right.value)
         return node
 
-    @staticmethod
-    def _lazy_push_down(node):
-        if node.bound_l == node.bound_r:
-            return
-        node.left.value += (node.left.bound_r - node.bound_l + 1) * node.lazy_tag
-        node.left.lazy_tag += node.lazy_tag
-
-        node.right.value += (node.right.bound_r - node.right.bound_l + 1) * node.lazy_tag
-        node.right.lazy_tag += node.lazy_tag
-
-        node.lazy_tag = 0
-
-    @property
-    def lazy_push_down(self):
-        return self._lazy_push_down
-
-    @lazy_push_down.setter
-    def lazy_push_down(self, func: callable):
-        self._lazy_push_down = func
-
     def __len__(self):
         return len(self.data)
 
 
-if __name__ == '__main__':
-    a = SegmentTree(data=list(range(1, 9)), merger=lambda x, y: x + y)
-    a.print_tree()
-    a.update_segment(0, 3, 4)
-    print(a.query(0, 1))
-    # a = SegmentTree(data=list(range(10000)), merger=lambda x, y: x + y)
-    # start = time.time()
-    # m = 100
-    # for _ in range(m):
-    #     for _i in range(1000, 2001):
-    #         a.update(_i, randint(0, 9999))
-    #
-    # print(a.query(2, 9999))
-    # end = time.time()
-    # print(end - start)
+class ObjWithSegmentTree:
+    def __init__(self, data):
+        self.data = data
+        self._segment_tree = SegmentTree(data, merger=self._merger, lazy_push_down=self._lazy_push_down,
+                                         lazy_tag_processor=self._lazy_tag_processor)
+
+    @staticmethod
+    def _merger(x, y):
+        raise NotImplementedError()
+
+    @staticmethod
+    def _lazy_push_down(node):
+        raise NotImplementedError()
+
+    @staticmethod
+    def _lazy_tag_processor(node):
+        raise NotImplementedError()
+
+    @property
+    def update(self):
+        return self._segment_tree.update_segment
+
+    @property
+    def query(self):
+        return self._segment_tree.query
