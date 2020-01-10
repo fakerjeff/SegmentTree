@@ -20,14 +20,4 @@ class BaseLoopWithUpdate:
 
 
 if __name__ == '__main__':
-    import time
-    a = BaseLoopWithUpdate(list(range(10000)))
-    start = time.time()
-    m = 100
-    for _ in range(m):
-        for _i in range(1000, 2001):
-            a.update(_i, randint(0, 9999))
-    for _i in range(1000, 2001):
-        print(a.sum_range(2, 9999))
-    end = time.time()
-    print(end - start)
+    pass

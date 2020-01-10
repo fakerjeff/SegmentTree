@@ -1,6 +1,3 @@
-from random import randint, sample
-
-
 class Node:
     def __init__(self, left=None, right=None, bound_l=None, bound_r=None, value=None, is_left=None, is_right=None):
         self.is_left = is_left
@@ -10,6 +7,7 @@ class Node:
         self.bound_l = bound_l
         self.bound_r = bound_r
         self.value = value
+        self.lazy_tag = 0
 
     def __str__(self):
 
@@ -19,7 +17,7 @@ class Node:
             prefix = 'right'
         else:
             prefix = ''
-        return f'{prefix}[{self.bound_l}-{self.bound_r}:{self.value}]'
+        return f'{prefix}[{self.bound_l}-{self.bound_r}:{self.value}|lazy:{self.lazy_tag if self.lazy_tag else "False"}]'
 
 
 class SegmentTree:
@@ -49,12 +47,12 @@ class SegmentTree:
         if node.bound_l == node.bound_r:
             node.value = self.data[node.bound_l]
             return node
-        mid = node.bound_l + (node.bound_r - node.bound_l) // 2
+        mid = node.bound_l + (node.bound_r - node.bound_l) // 2  # (r + l) / 2
         left_node = self._build_segment_tree(Node(bound_l=node.bound_l, bound_r=mid, is_left=True))
         right_node = self._build_segment_tree(Node(bound_l=mid + 1, bound_r=node.bound_r, is_right=True))
         node.left = left_node
         node.right = right_node
-        node.value = self._merger(left_node.value, right_node.value)
+        node.value = self._merger(left_node.value, right_node.value) # left + right
         return node
 
     def get(self, index):
@@ -104,6 +102,9 @@ class SegmentTree:
         :param query_r:
         :return:
         """
+        if node.lazy_tag:
+            self._lazy_push_down(node)
+
         if node.bound_l == query_l and node.bound_r == query_r:
             return node.value
         mid = node.bound_l + (node.bound_r - node.bound_l) // 2
@@ -120,35 +121,85 @@ class SegmentTree:
         if index < 0 or index > len(self.data) - 1:
             raise Exception('Invalid Parameter')
         self.data[index] = value
-        self._update_tree(self._root, index, value)
+        self._update(self._root, index, value)
 
-    def _update_tree(self, node, index, value):
+    def _update(self, node, index, value):
         if node.bound_l == index and node.bound_r == index:
             node.value = value
             return node
         mid = node.bound_l + (node.bound_r - node.bound_l) // 2
         if index <= mid:
-            node.left = self._update_tree(node.left, index, value)
+            node.left = self._update(node.left, index, value)
         else:
-            node.right = self._update_tree(node.right, index, value)
+            node.right = self._update(node.right, index, value)
 
         node.value = self._merger(node.left.value, node.right.value)
         return node
+
+    def update_segment(self, l, r, x):
+        """
+        更新区间
+        """
+        if (l < 0 or l > len(self.data) - 1) or (
+                r < 0 or r > len(self.data) - 1) or r < l:
+            raise Exception('Invalid Parameter')
+
+        self._update_segment(self._root, l, r, x)
+
+    def _update_segment(self, node, l, r, x):
+        if node.bound_l == l and node.bound_r == r:
+            node.value += (r - l + 1) * x
+            node.lazy_tag += x
+            return node
+
+        mid = node.bound_l + (node.bound_r - node.bound_l) // 2
+        if r <= mid:
+            node.left = self._update_segment(node.left, l, r, x)
+
+        elif l >= mid + 1:
+            node.right = self._update_segment(node.right, l, r, x)
+        else:
+            node.left = self._update_segment(node.left, l, mid, x)
+            node.right = self._update_segment(node.right, mid + 1, r, x)
+        node.value = self._merger(node.left.value, node.right.value)
+        return node
+
+    @staticmethod
+    def _lazy_push_down(node):
+        if node.bound_l == node.bound_r:
+            return
+        node.left.value += (node.left.bound_r - node.bound_l + 1) * node.lazy_tag
+        node.left.lazy_tag += node.lazy_tag
+
+        node.right.value += (node.right.bound_r - node.right.bound_l + 1) * node.lazy_tag
+        node.right.lazy_tag += node.lazy_tag
+
+        node.lazy_tag = 0
+
+    @property
+    def lazy_push_down(self):
+        return self._lazy_push_down
+
+    @lazy_push_down.setter
+    def lazy_push_down(self, func: callable):
+        self._lazy_push_down = func
 
     def __len__(self):
         return len(self.data)
 
 
 if __name__ == '__main__':
-    import time
-
-    a = SegmentTree(data=list(range(10000)), merger=lambda x, y: x + y)
-    start = time.time()
-    m = 100
-    for _ in range(m):
-        for _i in range(1000, 2001):
-            a.update(_i, randint(0, 9999))
-
-    print(a.query(2, 9999))
-    end = time.time()
-    print(end - start)
+    a = SegmentTree(data=list(range(1, 9)), merger=lambda x, y: x + y)
+    a.print_tree()
+    a.update_segment(0, 3, 4)
+    print(a.query(0, 1))
+    # a = SegmentTree(data=list(range(10000)), merger=lambda x, y: x + y)
+    # start = time.time()
+    # m = 100
+    # for _ in range(m):
+    #     for _i in range(1000, 2001):
+    #         a.update(_i, randint(0, 9999))
+    #
+    # print(a.query(2, 9999))
+    # end = time.time()
+    # print(end - start)

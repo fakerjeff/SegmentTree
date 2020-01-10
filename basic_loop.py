@@ -3,6 +3,7 @@ def sum_range(data, i, j):
     for _i in range(i, j + 1):
         _sum += data[_i]
     return _sum
+#  O(n)
 
 
 if __name__ == '__main__':

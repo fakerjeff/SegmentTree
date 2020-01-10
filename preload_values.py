@@ -10,6 +10,8 @@ class PreloadValues:
         if (l < 0 or l > len(self.data) - 1) or (r < 0 or r > len(self.data) - 1) or r < l:
             raise Exception('Invalid Parameter')
         return self._sum[r + 1] - self._sum[l]
+#      O(1) O(n)
+
 
 
 if __name__ == '__main__':
