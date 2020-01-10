@@ -10,6 +10,6 @@ if __name__ == '__main__':
     import time
 
     start = time.time()
-    print(sum_range(list(range(10000)), 2, 9999))
+    print(sum_range(list(range(100000)), 2, 74983))
     end = time.time()
     print(end - start)

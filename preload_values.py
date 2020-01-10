@@ -19,11 +19,11 @@ class PreloadValues:
 
 
 if __name__ == '__main__':
-    data = [randint(0, 9999) for _ in list(range(10000))]
+    data = [randint(0, 99999) for _ in list(range(100000))]
     a = PreloadValues(data)
     import time
 
     start = time.time()
-    print(a.sum_range(2, 7498))
+    print(a.sum_range(2, 74983))
     end = time.time()
     print(end - start)

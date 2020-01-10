@@ -29,9 +29,9 @@ class SumMachine(ObjWithSegmentTree):
 
 if __name__ == '__main__':
 
-    data = [randint(0, 9999) for _ in list(range(10000))]
+    data = [randint(0, 99999) for _ in list(range(100000))]
     m = 1000
-    i, j = randint(0, 9999), randint(0, 9999)
+    i, j = randint(0, 99999), randint(0, 99999)
     if i > j:
         i, j = j, i
 
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     start = time.time()
     for _ in range(m):
-        sum_machine.update(i, j, randint(0, 9999))
-    print(sum_machine.query(2, 7498))
+        sum_machine.update(i, j, randint(0, 99999))
+    print(sum_machine.query(2, 74983))
     end = time.time()
     print(end - start)

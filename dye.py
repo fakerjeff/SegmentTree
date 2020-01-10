@@ -43,9 +43,9 @@ class DyeWall(ObjWithSegmentTree):
 
 
 if __name__ == '__main__':
-    data = [{randint(BLUE, GREEN)} for _ in list(range(10000))]
+    data = [{randint(BLUE, GREEN)} for _ in list(range(100000))]
     m = 1000
-    i, j = randint(0, 9999), randint(0, 9999)
+    i, j = randint(0, 99999), randint(0, 99999)
     if i > j:
         i, j = j, i
     dye_wall = DyeWall(data)
@@ -55,6 +55,6 @@ if __name__ == '__main__':
     for _ in range(m):
         dye_wall.dye(i, j, randint(BLUE, GREEN))
     # print(dye_wall.query_color_numbers(0, len(data) - 1))
-    print(dye_wall.query_color_numbers(2, 7498))
+    print(dye_wall.query_color_numbers(2, 74983))
     end = time.time()
     print(end - start)

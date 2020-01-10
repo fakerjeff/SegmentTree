@@ -21,9 +21,9 @@ class BaseLoopWithUpdate:
 
 
 if __name__ == '__main__':
-    data = [randint(0, 9999) for _ in list(range(10000))]
+    data = [randint(0, 99999) for _ in list(range(100000))]
     m = 1000
-    i, j = randint(0, 9999), randint(0, 9999)
+    i, j = randint(0, 99999), randint(0, 99999)
     if i > j:
         i, j = j, i
     a = BaseLoopWithUpdate(data)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     start = time.time()
     for _ in range(m):
-        a.update(i, j, randint(0, 9999))
-    print(a.sum_range(2, 7498))
+        a.update(i, j, randint(0, 99999))
+    print(a.sum_range(2, 74983))
     end = time.time()
     print(end - start)
