@@ -2,9 +2,11 @@ from random import randint
 
 
 class Node:
-    def __init__(self, left=None, right=None, bound_l=None, bound_r=None, value=None, is_left=None, is_right=None):
+    def __init__(self, left=None, right=None, bound_l=None, bound_r=None, value=None, is_left=None, is_right=None,
+                 is_leaf=None):
         self.is_left = is_left
         self.is_right = is_right
+        self.is_leaf = is_leaf
         self.left = left
         self.right = right
         self.bound_l = bound_l
@@ -51,6 +53,7 @@ class SegmentTree:
         """
         if node.bound_l == node.bound_r:
             node.value = self.data[node.bound_l]
+            node.is_leaf = True
             return node
         mid = node.bound_l + (node.bound_r - node.bound_l) // 2  # (r + l) / 2
         left_node = self._build_segment_tree(Node(bound_l=node.bound_l, bound_r=mid, is_left=True))
