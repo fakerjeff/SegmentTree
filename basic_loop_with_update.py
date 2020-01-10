@@ -26,6 +26,7 @@ if __name__ == '__main__':
     i, j = randint(0, 99999), randint(0, 99999)
     if i > j:
         i, j = j, i
+    print(i, j)
     a = BaseLoopWithUpdate(data)
     import time
 
